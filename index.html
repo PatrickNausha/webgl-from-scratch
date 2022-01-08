@@ -7,14 +7,16 @@
 		<title>WebGL from scratch</title>
 	</head>
 	<body>
-		<canvas id="gl-canvas" width="640" height="480"></canvas>
+		<canvas id="gl-canvas" width="480" height="480"></canvas>
 		<script>
 			"use strict";
+			const triangleSideLength = 1;
+			const height = (Math.sqrt(3) / 2) * triangleSideLength;
 			const positions = new Float32Array(
 				[
-					[0, 0],
-					[0, 0.5],
-					[0.7, 0],
+					[0, height / 2],
+					[triangleSideLength / 2, -height / 2],
+					[-triangleSideLength / 2, -height / 2],
 				].flat()
 			);
 
