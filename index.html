@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>WebGL from scratch</title>
+	</head>
+	<body>
+		<canvas id="gl-canvas" width="640" height="480"></canvas>
+		<script>
+			function init() {
+				const canvas = document.querySelector("#gl-canvas");
+				const gl = canvas.getContext("webgl2");
+				if (!gl) {
+					throw new Error("webgl2 not supported");
+				}
+
+				const vertexShaderSource = document
+					.getElementById("vertex-shader")
+					.text.trim();
+				const fragmentShaderSource = document
+					.getElementById("fragment-shader")
+					.text.trim();
+
+				const vertexShader = createShader(
+					gl,
+					gl.VERTEX_SHADER,
+					vertexShaderSource
+				);
+				const fragmentShader = createShader(
+					gl,
+					gl.FRAGMENT_SHADER,
+					fragmentShaderSource
+				);
+			}
+
+			window.addEventListener("DOMContentLoaded", () => {
+				init();
+			});
+
+			function createShader(gl, type, source) {
+				const shader = gl.createShader(type);
+				gl.shaderSource(shader, source);
+				gl.compileShader(shader);
+				const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+				if (success) {
+					return shader;
+				}
+
+				console.log(gl.getShaderInfoLog(shader));
+				gl.deleteShader(shader);
+			}
+		</script>
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			#version 300 es
+
+			// an attribute is an input (in) to a vertex shader.
+			// It will receive data from a buffer
+			in vec4 a_position;
+
+			// all shaders have a main function
+			void main() {
+			  // gl_Position is a special variable a vertex shader
+			  // is responsible for setting
+			  gl_Position = a_position;
+			}
+		</script>
+
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			#version 300 es
+						// fragment shaders don't have a default precision so we need
+						// to pick one. highp is a good default. It means "high precision"
+						precision highp float;
+
+						// we need to declare an output for the fragment shader
+						out vec4 outColor;
+
+						void main() {
+						  // Just set the output to a constant reddish-purple
+						  outColor = vec4(1, 0, 0.5, 1);
+						}
+		</script>
+	</body>
+</html>
