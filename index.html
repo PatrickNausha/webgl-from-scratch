@@ -81,8 +81,25 @@
 				gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 				gl.clearColor(0, 0, 0, 0);
-				gl.clear(gl.COLOR_BUFFER_BIT);
-				gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+				const modelMatrixUniformLocation = gl.getUniformLocation(
+					program,
+					"modelMatrix"
+				);
+
+				// Start render loop
+				(function render() {
+					gl.clear(gl.COLOR_BUFFER_BIT);
+					gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+					gl.uniformMatrix4fv(
+						modelMatrixUniformLocation,
+						false,
+						new Float32Array(getZRotationMatrix(Date.now() / 1000))
+					);
+
+					window.requestAnimationFrame(render);
+				})();
 			}
 
 			window.addEventListener("DOMContentLoaded", () => {
@@ -115,14 +132,25 @@
 
 				return program;
 			}
+
+			// Return identity matrix rotated about Z axis
+			function getZRotationMatrix(radians) {
+				return [
+					[Math.cos(radians), -Math.sin(radians), 0, 0],
+					[Math.sin(radians), Math.cos(radians), 0, 0],
+					[0, 0, 1, 0],
+					[0, 0, 0, 1],
+				].flat();
+			}
 		</script>
 		<script id="vertex-shader" type="x-shader/x-vertex">
 			#version 300 es
 
 			in vec4 vertexShaderPosition;
+			uniform mat4 modelMatrix;
 
 			void main() {
-				gl_Position = vertexShaderPosition;
+				gl_Position = modelMatrix * vertexShaderPosition;
 			}
 		</script>
 
