@@ -11,12 +11,13 @@
 		<script>
 			"use strict";
 			const triangleSideLength = 1;
-			const height = (Math.sqrt(3) / 2) * triangleSideLength;
+			const triangleTop = triangleSideLength / Math.sqrt(3);
+			const triangleBottom = -triangleTop / 2;
 			const positions = new Float32Array(
 				[
-					[0, height / 2],
-					[triangleSideLength / 2, -height / 2],
-					[-triangleSideLength / 2, -height / 2],
+					[0, triangleTop],
+					[triangleSideLength / 2, triangleBottom],
+					[-triangleSideLength / 2, triangleBottom],
 				].flat()
 			);
 
