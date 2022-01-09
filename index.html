@@ -20,6 +20,13 @@
 					[-triangleSideLength / 2, triangleBottom],
 				].flat()
 			);
+			const colors = new Float32Array(
+				[
+					[1, 0, 0],
+					[0, 1, 0],
+					[0, 0, 1],
+				].flat()
+			);
 
 			function init() {
 				const canvas = document.querySelector("#gl-canvas");
@@ -53,29 +60,46 @@
 
 				const positionAttributeLocation = gl.getAttribLocation(
 					program,
-					"vertexShaderPosition"
+					"position"
 				);
+				const colorAttributeLocation = gl.getAttribLocation(program, "color");
 
 				const positionBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 				gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
+				const colorBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+				gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+
 				const vertexArrayObject = gl.createVertexArray();
 				gl.bindVertexArray(vertexArrayObject);
 				gl.enableVertexAttribArray(positionAttributeLocation);
+				gl.enableVertexAttribArray(colorAttributeLocation);
 
-				// Bind the buffer currently bound to gl.ARRAY_BUFFER
+				gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 				const vertexDimensions = 2;
-				const normalize = false; // Value is ignored for floats
-				const stride = 0; // Data is tightly packed
-				const offset = 0;
 				gl.vertexAttribPointer(
 					positionAttributeLocation,
 					vertexDimensions,
 					gl.FLOAT,
-					normalize,
-					stride,
-					offset
+					false, // normalize: false because this value is ignored for floats
+					0, // stride
+					0 // offset
+				);
+
+				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+				const colorDimensions = 3;
+				const normalize = false; // Value is ignored for floats
+				const stride = 0; // Data is tightly packed
+				const offset = 0;
+				gl.vertexAttribPointer(
+					colorAttributeLocation,
+					colorDimensions,
+					gl.FLOAT,
+					false, // normalize: false because this value is ignored for floats
+					0, // stride
+					0 // offset
 				);
 
 				gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -146,11 +170,15 @@
 		<script id="vertex-shader" type="x-shader/x-vertex">
 			#version 300 es
 
-			in vec4 vertexShaderPosition;
+			in vec4 position;
+			in vec4 color;
 			uniform mat4 modelMatrix;
 
+			out vec4 vColor;
+
 			void main() {
-				gl_Position = modelMatrix * vertexShaderPosition;
+				vColor = color;
+				gl_Position = modelMatrix * position;
 			}
 		</script>
 
@@ -159,10 +187,12 @@
 
 			precision highp float;
 
+			in vec4 vColor;
+
 			out vec4 outputColor;
 
 			void main() {
-				outputColor = vec4(0, 0.7, 0.5, 1);
+				outputColor = vColor;
 			}
 		</script>
 	</body>
